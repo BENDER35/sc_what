@@ -1,0 +1,69 @@
+name: Release en GitHub
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag existente para publicar (por ejemplo v1.0.0)"
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Construir zip y publicar
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.event.inputs.tag || github.ref_name }}
+    steps:
+      - name: Checkout completo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
+      - name: Validar tag
+        run: |
+          set -euo pipefail
+          if ! git rev-parse --verify --quiet "refs/tags/${TAG}" >/dev/null; then
+            echo "::error::El tag ${TAG} no existe"
+            exit 1
+          fi
+          echo "Publicando ${TAG}"
+
+      - name: Construir artefactos
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          prefix="sc_what-${TAG}"
+          git archive --format=zip --prefix="${prefix}/" -o "dist/${prefix}.zip" "${TAG}"
+          (cd dist && sha256sum "${prefix}.zip" > "${prefix}.zip.sha256")
+          ls -lh dist
+
+      - name: Publicar release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          prefix="sc_what-${TAG}"
+          if gh release view "${TAG}" >/dev/null 2>&1; then
+            echo "La release ya existe; actualizando assets."
+            gh release upload "${TAG}" \
+              "dist/${prefix}.zip" \
+              "dist/${prefix}.zip.sha256" \
+              --clobber
+          else
+            gh release create "${TAG}" \
+              "dist/${prefix}.zip" \
+              "dist/${prefix}.zip.sha256" \
+              --title "sc_what ${TAG}" \
+              --generate-notes \
+              --verify-tag
+          fi

@@ -1,0 +1,42 @@
+# Entornos virtuales
+.venv/
+sc_gm/
+venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.eggs/
+
+# Herramientas
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Resultados y datos locales
+output/
+results*.csv
+results*.json
+results*.ndjson
+fem*.csv
+fem*.json
+pegging*.csv
+pegging*.json
+sodomy*.csv
+sodomy*.json
+
+# Logs y secretos
+*.log
+.env
+.env.*
+!.env.example
+
+# Sistema
+.DS_Store
+Thumbs.db

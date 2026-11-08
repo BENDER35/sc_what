@@ -1,0 +1,64 @@
+name: Mirror a GitLab
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mirror-gitlab
+  cancel-in-progress: false
+
+jobs:
+  mirror:
+    name: Copia de seguridad en GitLab
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout completo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Comprobar secreto
+        env:
+          GITLAB_MIRROR_TOKEN: ${{ secrets.GITLAB_MIRROR_TOKEN }}
+        run: |
+          if [ -z "${GITLAB_MIRROR_TOKEN}" ]; then
+            echo "::error::Falta el secreto GITLAB_MIRROR_TOKEN"
+            exit 1
+          fi
+
+      - name: Empujar main y tags a GitLab
+        env:
+          GITLAB_MIRROR_TOKEN: ${{ secrets.GITLAB_MIRROR_TOKEN }}
+        run: |
+          set -euo pipefail
+          git remote add gitlab "https://oauth2:${GITLAB_MIRROR_TOKEN}@gitlab.com/BENDER_5000/sc_what.git"
+          git push --prune gitlab \
+            "+refs/heads/*:refs/heads/*" \
+            "+refs/tags/*:refs/tags/*"
+
+      - name: Verificar espejo
+        env:
+          GITLAB_MIRROR_TOKEN: ${{ secrets.GITLAB_MIRROR_TOKEN }}
+        run: |
+          set -euo pipefail
+          remote="https://oauth2:${GITLAB_MIRROR_TOKEN}@gitlab.com/BENDER_5000/sc_what.git"
+          local_main="$(git rev-parse refs/heads/main)"
+          remote_main="$(git ls-remote "${remote}" refs/heads/main | cut -f1)"
+          echo "GitHub main: ${local_main}"
+          echo "GitLab main: ${remote_main}"
+          test "${remote_main}" = "${local_main}"
+
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            local_tag="$(git rev-parse "refs/tags/${GITHUB_REF_NAME}")"
+            remote_tag="$(git ls-remote "${remote}" "refs/tags/${GITHUB_REF_NAME}" | cut -f1)"
+            echo "GitHub tag:  ${local_tag}"
+            echo "GitLab tag:  ${remote_tag}"
+            test "${remote_tag}" = "${local_tag}"
+          fi
