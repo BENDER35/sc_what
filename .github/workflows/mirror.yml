@@ -38,9 +38,14 @@ jobs:
           GITLAB_MIRROR_TOKEN: ${{ secrets.GITLAB_MIRROR_TOKEN }}
         run: |
           set -euo pipefail
+          # En ejecuciones por tag, HEAD está desacoplado y pueden faltar
+          # ramas locales; se refrescan todas las refs de origin antes de empujar.
+          git fetch --prune origin \
+            "+refs/heads/*:refs/remotes/origin/*" \
+            "+refs/tags/*:refs/tags/*"
           git remote add gitlab "https://oauth2:${GITLAB_MIRROR_TOKEN}@gitlab.com/BENDER_5000/sc_what.git"
           git push --prune gitlab \
-            "+refs/heads/*:refs/heads/*" \
+            "+refs/remotes/origin/*:refs/heads/*" \
             "+refs/tags/*:refs/tags/*"
 
       - name: Verificar espejo
@@ -49,7 +54,7 @@ jobs:
         run: |
           set -euo pipefail
           remote="https://oauth2:${GITLAB_MIRROR_TOKEN}@gitlab.com/BENDER_5000/sc_what.git"
-          local_main="$(git rev-parse refs/heads/main)"
+          local_main="$(git rev-parse refs/remotes/origin/main)"
           remote_main="$(git ls-remote "${remote}" refs/heads/main | cut -f1)"
           echo "GitHub main: ${local_main}"
           echo "GitLab main: ${remote_main}"
