@@ -65,7 +65,7 @@ def test_save_json_with_metadata(tmp_path: Path) -> None:
                 GroupLink(
                     platform="telegram",
                     title="Grupo",
-                    link="https://t.me/python",
+                    link="https://t.me/sc_what_test_only",
                     description="Comunidad",
                     queries=["python"],
                 )
@@ -77,7 +77,7 @@ def test_save_json_with_metadata(tmp_path: Path) -> None:
 
     data = json.loads(path.read_text(encoding="utf-8"))
     assert data["meta"]["queries"] == ["python"]
-    assert data["results"]["telegram"][0]["link"] == "https://t.me/python"
+    assert data["results"]["telegram"][0]["link"] == "https://t.me/sc_what_test_only"
 
 
 def test_save_csv_is_excel_friendly(tmp_path: Path) -> None:
@@ -87,7 +87,7 @@ def test_save_csv_is_excel_friendly(tmp_path: Path) -> None:
                 GroupLink(
                     platform="whatsapp",
                     title="=Título con fórmula",
-                    link="https://chat.whatsapp.com/ABCDEFGHIJKLMNOPQRSTUV",
+                    link="https://chat.whatsapp.com/00000000000000000000",
                     description="Línea 1\nLínea 2",
                     source_url="https://ejemplo.com",
                     queries=["cripto"],

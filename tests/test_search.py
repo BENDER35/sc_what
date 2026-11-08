@@ -29,7 +29,7 @@ class FakeDDGS:
         FakeDDGS.calls += 1
         if FakeDDGS.calls == 1:
             raise group_finder.RatelimitException("rate limit")
-        return [{"title": "ok", "href": "https://t.me/python", "body": ""}]
+        return [{"title": "ok", "href": "https://t.me/sc_what_test_only", "body": ""}]
 
 
 def test_run_search_retries_after_rate_limit(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -49,12 +49,12 @@ def test_search_platform_extracts_and_merges(monkeypatch: pytest.MonkeyPatch) ->
             {
                 "title": "Grupo de Python",
                 "href": "https://ejemplo.com/grupos",
-                "body": "Únete en https://t.me/+AbCdEfGhIjK",
+                "body": "Únete en https://t.me/+0000000000000000",
             },
             {
                 "title": "Otro resultado",
                 "href": "https://ejemplo.com/otro",
-                "body": "También https://t.me/+AbCdEfGhIjK",
+                "body": "También https://t.me/+0000000000000000",
             },
         ]
 
@@ -64,7 +64,7 @@ def test_search_platform_extracts_and_merges(monkeypatch: pytest.MonkeyPatch) ->
 
     assert result.error is None
     assert len(result.items) == 1
-    assert result.items[0].link == "https://t.me/+AbCdEfGhIjK"
+    assert result.items[0].link == "https://t.me/+0000000000000000"
     assert result.items[0].queries == ["python"]
     assert "https://ejemplo.com/grupos" in result.source_pages
     assert "https://ejemplo.com/otro" in result.source_pages
@@ -80,7 +80,7 @@ def test_merge_platform_result_deduplicates() -> None:
             GroupLink(
                 platform="telegram",
                 title="",
-                link="https://t.me/python",
+                link="https://t.me/sc_what_test_only",
                 queries=["python"],
             )
         ],
@@ -91,7 +91,7 @@ def test_merge_platform_result_deduplicates() -> None:
             GroupLink(
                 platform="telegram",
                 title="Python",
-                link="https://t.me/python",
+                link="https://t.me/sc_what_test_only",
                 description="Comunidad",
                 queries=["gaming"],
             )

@@ -15,19 +15,19 @@ from group_finder import (
     ("text", "platform", "expected"),
     [
         (
-            "https://chat.whatsapp.com/ABCDEFGHIJKLMNOPQRSTUV",
+            "https://chat.whatsapp.com/00000000000000000000",
             "whatsapp",
-            "https://chat.whatsapp.com/ABCDEFGHIJKLMNOPQRSTUV",
+            "https://chat.whatsapp.com/00000000000000000000",
         ),
         (
-            "chat.whatsapp.com/ABCDEFGHIJKLMNOPQRSTUV",
+            "chat.whatsapp.com/00000000000000000000",
             "whatsapp",
-            "https://chat.whatsapp.com/ABCDEFGHIJKLMNOPQRSTUV",
+            "https://chat.whatsapp.com/00000000000000000000",
         ),
         (
-            "https://chat.whatsapp.com/invite/ABCDEFGHIJKLMNOPQRSTUV",
+            "https://chat.whatsapp.com/invite/00000000000000000000",
             "whatsapp",
-            "https://chat.whatsapp.com/ABCDEFGHIJKLMNOPQRSTUV",
+            "https://chat.whatsapp.com/00000000000000000000",
         ),
         (
             "https://signal.group/#CjQKIBabc+/def==",
@@ -57,24 +57,24 @@ from group_finder import (
             "https://discord.gg/python",
         ),
         (
-            "https://t.me/+AbCdEfGhIjK",
+            "https://t.me/+0000000000000000",
             "telegram",
-            "https://t.me/+AbCdEfGhIjK",
+            "https://t.me/+0000000000000000",
         ),
         (
-            "https://t.me/joinchat/AbCdEfGhIjK",
+            "https://t.me/joinchat/0000000000000000",
             "telegram",
-            "https://t.me/+AbCdEfGhIjK",
+            "https://t.me/+0000000000000000",
         ),
         (
-            "https://t.me/python",
+            "https://t.me/sc_what_test_only",
             "telegram",
-            "https://t.me/python",
+            "https://t.me/sc_what_test_only",
         ),
         (
-            "https://t.me/telegramgroups",
+            "https://t.me/sc_what_test_only_2",
             "telegram",
-            "https://t.me/telegramgroups",
+            "https://t.me/sc_what_test_only_2",
         ),
     ],
 )
@@ -89,8 +89,8 @@ def test_extract_links(text: str, platform: str, expected: str) -> None:
         ("https://t.me/setlanguage/es", "telegram"),
         ("https://t.me/addstickers/foo", "telegram"),
         ("https://t.me/s/python", "telegram"),
-        ("https://evil.com/t.me/python", "telegram"),
-        ("https://example.com/chat.whatsapp.com/ABCDEFGHIJKLMNOPQRSTUV", "whatsapp"),
+        ("https://evil.com/t.me/sc_what_test_only", "telegram"),
+        ("https://example.com/chat.whatsapp.com/00000000000000000000", "whatsapp"),
     ],
 )
 def test_extract_links_rejects_noise(text: str, platform: str) -> None:
@@ -98,12 +98,16 @@ def test_extract_links_rejects_noise(text: str, platform: str) -> None:
 
 
 def test_extract_links_unescapes_html_and_strips_punctuation() -> None:
-    found = extract_links("(mira https://t.me/python?a=1&amp;b=2).", PLATFORMS["telegram"])
-    assert found == {"https://t.me/python"}
+    found = extract_links(
+        "(mira https://t.me/sc_what_test_only?a=1&amp;b=2).", PLATFORMS["telegram"]
+    )
+    assert found == {"https://t.me/sc_what_test_only"}
 
 
 def test_normalize_url_rejects_wrong_host() -> None:
-    assert normalize_url("https://example.com/t.me/python", PLATFORMS["telegram"]) is None
+    assert (
+        normalize_url("https://example.com/t.me/sc_what_test_only", PLATFORMS["telegram"]) is None
+    )
 
 
 def test_build_query_groups_or_branches() -> None:
