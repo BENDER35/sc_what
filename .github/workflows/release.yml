@@ -38,6 +38,14 @@ jobs:
           fi
           echo "Publicando ${TAG}"
 
+      - name: Comprobar que no hay datos de resultados
+        run: |
+          set -euo pipefail
+          if git ls-tree -r --name-only "${TAG}" | grep -E '\.(csv|json|ndjson)$'; then
+            echo "::error::El tag ${TAG} contiene archivos de resultados; no se publicará."
+            exit 1
+          fi
+
       - name: Construir artefactos
         run: |
           set -euo pipefail

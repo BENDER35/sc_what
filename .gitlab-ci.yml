@@ -52,6 +52,12 @@ release:
 
       TAG="${CI_COMMIT_TAG}"
       PREFIX="sc_what-${TAG}"
+
+      if git ls-tree -r --name-only "${TAG}" | grep -E '\.(csv|json|ndjson)$'; then
+        echo "El tag ${TAG} contiene archivos de resultados; no se publicará."
+        exit 1
+      fi
+
       mkdir -p dist
       git archive --format=zip --prefix="${PREFIX}/" -o "dist/${PREFIX}.zip" "${TAG}"
       (cd dist && sha256sum "${PREFIX}.zip" > "${PREFIX}.zip.sha256")
