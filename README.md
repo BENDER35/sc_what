@@ -267,7 +267,7 @@ pytest --cov=group_finder --cov-report=term-missing
 ## Releases y mirror
 
 - **GitHub** es el repositorio principal.
-- **GitLab** es la copia de seguridad. El workflow `.github/workflows/mirror.yml` hace `git push --mirror` a GitLab en cada push a `main` y en cada tag.
+- **GitLab** es la copia de seguridad. El workflow `.github/workflows/mirror.yml` empuja todas las ramas y tags a GitLab (con refspecs explícitos) en cada push a `main` y en cada tag.
 - Al crear un tag `v*`:
   - GitHub Actions genera `sc_what-<tag>.zip` y crea la release en GitHub.
   - GitLab CI genera el mismo zip y crea la release en GitLab (requiere la variable `GITLAB_RELEASE_TOKEN` con scope `api`).
